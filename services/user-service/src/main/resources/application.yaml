@@ -1,0 +1,29 @@
+#spring:
+#  application:
+#    name: user-service
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/user_service
+#    username: postgres
+#    password: 123456
+#    driver-class-name: org.postgresql.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  secret: DGpNSf0cVmk8gaM53vr/Sn/8QGbxCv2/CIGdmBQpjo8=
+
+

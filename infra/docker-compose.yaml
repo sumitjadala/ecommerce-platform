@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  user-db:
+    image: postgres:16
+    container_name: user_db
+    environment:
+      POSTGRES_DB: user_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5433:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+
+  user-service:
+    build: ../services/user-service  # adjust path if your compose file is elsewhere
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/user_service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+      JWT_SECRET: DGpNSf0cVmk8gaM53vr/Sn/8QGbxCv2/CIGdmBQpjo8=
+    depends_on:
+      - user-db
+
+volumes:
+  user_db_data:
