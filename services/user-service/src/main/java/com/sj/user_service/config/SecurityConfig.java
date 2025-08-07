@@ -24,8 +24,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/register", "/api/users/login", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs/**", "/swagger-ui.html")
-                        .permitAll()
+                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")                        .permitAll()
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "SELLER") // restrict as needed
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
