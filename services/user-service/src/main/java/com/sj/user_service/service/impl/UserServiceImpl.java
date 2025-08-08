@@ -64,6 +64,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
+    @Override
+    public UserResponseDto getUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Email Id"));
+        return toDto(user);
+    }
+
     private UserResponseDto toDto(User user) {
         return UserResponseDto.builder()
                 .id(user.getId())

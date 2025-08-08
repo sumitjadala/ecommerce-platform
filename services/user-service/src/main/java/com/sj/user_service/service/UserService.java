@@ -12,4 +12,6 @@ public interface UserService {
     String generateJwtForUser(User user);
 
     User getUserEntityByEmail(String email);
+
+    UserResponseDto getUserByEmail(String email);
 }

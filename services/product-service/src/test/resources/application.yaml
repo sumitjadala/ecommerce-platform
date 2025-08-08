@@ -1,0 +1,81 @@
+spring:
+  application:
+    name: product-service-test
+  datasource:
+    url: jdbc:tc:postgresql:14://localhost/product_service
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: false
+  liquibase:
+    enabled: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+server:
+  port: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.sj.product_service: DEBUG
+    org.springframework.security: INFO
+
+# JWT Configuration for tests
+jwt:
+  issuer-uri: http://localhost:8080/auth/realms/master
+  audience: product-service
+  secret: test-secret-key-for-testing-only
+  expiration: 86400000
+
+# AWS/MinIO S3 for tests
+aws:
+  s3:
+    bucket: test-product-images
+    endpoint: http://localhost:9000
+  cloudfront:
+    domain: cdn.local.test
+
+# Product Service for tests
+product:
+  image:
+    upload:
+      max-size: 10MB
+      allowed-types: jpg,jpeg,png,gif
+  pagination:
+    default-size: 20
+    max-size: 100
+
+# OpenAPI Configuration for tests
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
