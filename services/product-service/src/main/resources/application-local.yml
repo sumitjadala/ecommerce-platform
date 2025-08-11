@@ -1,0 +1,38 @@
+spring:
+  config:
+    import: file:C:/Users/sumit/sumit/freelancing/Project 2/ecommerce-platform/.env.local.properties
+  datasource:
+    url: jdbc:postgresql://localhost:5432/product_service
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+  liquibase:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  secret: ${JWT_SECRET}
+
+aws:
+  s3:
+    endpoint: ${S3_ENDPOINT}
+    bucket: ${AWS_S3_BUCKET}
+  credentials:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+
+server:
+  port: ${PRODUCT_SERVICE_PORT}
+
+logging:
+  level:
+    com.sj.product_service: DEBUG
+    org.hibernate.SQL: DEBUG

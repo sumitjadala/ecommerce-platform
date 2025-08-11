@@ -40,13 +40,9 @@ public class ProductController {
             Authentication authentication) {
 
         log.info("Creating product: {}", productRequestDto.getName());
-
-        // Extract seller ID from authentication
         String sellerId = extractSellerIdFromAuth(authentication);
         productRequestDto.setSellerId(UUID.fromString(sellerId));
-
         ProductResponseDto createdProduct = productService.createProduct(productRequestDto);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 

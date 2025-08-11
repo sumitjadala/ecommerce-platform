@@ -22,7 +22,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/actuator/health/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui.html","/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/api/v1/products/available").permitAll()
                 .requestMatchers("/api/v1/products/featured").permitAll()
                 .requestMatchers("/api/v1/products/search").permitAll()

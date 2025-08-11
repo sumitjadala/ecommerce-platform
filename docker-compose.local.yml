@@ -1,0 +1,83 @@
+version: '3.8'
+services:
+  user-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: user_service
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "5433:5432"
+    networks: [ecommerce-local]
+
+  product-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: product_service
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "5434:5432"
+    networks: [ecommerce-local]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks: [ecommerce-local]
+
+  kafka:
+    image: bitnami/kafka:latest
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+    ports:
+      - "9092:9092"
+    networks: [ecommerce-local]
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    ports:
+      - "2181:2181"
+    networks: [ecommerce-local]
+
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks: [ecommerce-local]
+
+  user-service:
+    build: ../services/user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "${USER_SERVICE_PORT}:8080"
+    depends_on: [user-db]
+    networks: [ecommerce-local]
+
+  product-service:
+    build: ../services/product-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "${PRODUCT_SERVICE_PORT}:8080"
+    depends_on: [product-db, redis, kafka, minio]
+    networks: [ecommerce-local]
+
+  api-gateway:
+    build: ../services/api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "${GATEWAY_PORT}:8080"
+    depends_on: [user-service, product-service]
+    networks: [ecommerce-local]
+
+networks:
+  ecommerce-local:
+    driver: bridge

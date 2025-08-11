@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+  user-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${USER_DB_NAME}
+      POSTGRES_USER: ${USER_DB_USER}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
+    networks: [ecommerce-prod]
+
+  product-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${PRODUCT_DB_NAME}
+      POSTGRES_USER: ${PRODUCT_DB_USER}
+      POSTGRES_PASSWORD: ${PRODUCT_DB_PASSWORD}
+    networks: [ecommerce-prod]
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    networks: [ecommerce-prod]
+
+  kafka:
+    image: bitnami/kafka:latest
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+    networks: [ecommerce-prod]
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    networks: [ecommerce-prod]
+
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9001"
+    networks: [ecommerce-prod]
+
+  user-service:
+    build: ../services/user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on: [user-db]
+    networks: [ecommerce-prod]
+
+  product-service:
+    build: ../services/product-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on: [product-db, redis, kafka, minio]
+    networks: [ecommerce-prod]
+
+  api-gateway:
+    build: ../services/api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "${GATEWAY_PORT}:8080"
+    depends_on: [user-service, product-service]
+    networks: [ecommerce-prod]
+
+networks:
+  ecommerce-prod:
+    driver: bridge
