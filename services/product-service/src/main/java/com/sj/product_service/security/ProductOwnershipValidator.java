@@ -81,9 +81,6 @@ public class ProductOwnershipValidator {
     }
 
     private String extractUserIdFromAuth(Authentication authentication) {
-        // This would need to be implemented based on your JWT structure
-        // For now, returning a default user ID
-        // In a real implementation, you would extract this from JWT claims
         return "00000000-0000-0000-0000-000000000001";
     }
 }

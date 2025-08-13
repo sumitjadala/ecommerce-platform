@@ -32,6 +32,11 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @GetMapping("/test")
+    public ResponseEntity<String> testApi() {
+        return ResponseEntity.ok("Api successful");
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('SELLER') or hasRole('ADMIN')")
     @Operation(summary = "Create a new product", description = "Creates a new product with seller authentication")
