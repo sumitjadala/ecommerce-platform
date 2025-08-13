@@ -76,7 +76,7 @@ public class Product {
     @Column(precision = 8, scale = 3)
     private BigDecimal weight;
 
-    @Column(columnDefinition = "JSONB")
+    @Column
     private String dimensions;
 
     @Column(columnDefinition = "TEXT[]")

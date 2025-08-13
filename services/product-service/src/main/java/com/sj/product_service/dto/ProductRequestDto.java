@@ -50,7 +50,7 @@ public class ProductRequestDto {
     @DecimalMin(value = "0.0", message = "Weight cannot be negative")
     private BigDecimal weight;
 
-    private String dimensions; // JSON: {length, width, height, unit}
+    private String dimensions;
 
     private List<String> tags;
 

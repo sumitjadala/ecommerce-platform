@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -209,7 +210,12 @@ public class ProductController {
     }
 
     private String extractSellerIdFromAuth(Authentication authentication) {
-        // TODO: Extract from JWT claims
-        return "00000000-0000-0000-0000-000000000001";
+        if (authentication != null && authentication.getDetails() instanceof Map<?, ?> details) {
+            Object sellerIdObj = details.get("sellerId");
+            if (sellerIdObj != null) {
+                return sellerIdObj.toString();
+            }
+        }
+        throw new IllegalArgumentException("Seller ID not found in JWT claims");
     }
 }

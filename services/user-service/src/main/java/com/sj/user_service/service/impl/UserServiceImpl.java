@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .role(dto.getRole() == null ? "SELLER" : dto.getRole())
+                .username(dto.getUsername())
                 .enabled(true)
                 .build();
         user = userRepo.save(user);
@@ -54,7 +55,7 @@ public class UserServiceImpl implements UserService {
     public String generateJwtForUser(User user) {
         return jwtUtil.generateToken(
                 user.getEmail(),
-                Map.of("role", user.getRole(), "userId", user.getId())
+                Map.of("role", user.getRole(), "userId", user.getId(), "sellerId", user.getUuid())
         );
     }
 

@@ -15,6 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -24,17 +26,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+
             if (jwtUtil.validateToken(token)) {
                 Claims claims = jwtUtil.extractClaims(token);
                 String username = claims.getSubject();
-                String role = claims.get("role").toString();
-                String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, Collections.singleton(new SimpleGrantedAuthority(authority)));
+                String role = claims.get("role", String.class);
+                String sellerId = claims.get("sellerId", String.class);
+                String authority = role != null && role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(username, null, Collections.singleton(new SimpleGrantedAuthority(authority)));
+                Map<String, Object> details = new HashMap<>();
+                details.put("sellerId", sellerId);
+                authentication.setDetails(details);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+
         filterChain.doFilter(request, response);
     }
+
 }

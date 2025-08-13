@@ -70,20 +70,20 @@ public class ProductServiceImpl implements ProductService {
 
         Product savedProduct = productRepository.save(product);
         log.info("Product created successfully with ID: {}", savedProduct.getId());
-
-        // Publish lifecycle events (Kafka + local)
-        eventPublisher.publishProductCreated(savedProduct);
-        ProductEvents.ProductLifecycleEvent localEvent = ProductEvents.ProductLifecycleEvent.builder()
-                .eventType("CREATED")
-                .productId(savedProduct.getId())
-                .sellerId(savedProduct.getSellerId())
-                .timestamp(Instant.now())
-                .version(1)
-                .build();
-        applicationEventPublisher.publishEvent(localEvent);
-
-        // Prime cache
-        cacheService.set(product(savedProduct.getId().toString()), ProductResponseDto.fromEntity(savedProduct), Duration.ofMinutes(15));
+//
+//        // Publish lifecycle events (Kafka + local)
+//        eventPublisher.publishProductCreated(savedProduct);
+//        ProductEvents.ProductLifecycleEvent localEvent = ProductEvents.ProductLifecycleEvent.builder()
+//                .eventType("CREATED")
+//                .productId(savedProduct.getId())
+//                .sellerId(savedProduct.getSellerId())
+//                .timestamp(Instant.now())
+//                .version(1)
+//                .build();
+//        applicationEventPublisher.publishEvent(localEvent);
+//
+//        // Prime cache
+//        cacheService.set(product(savedProduct.getId().toString()), ProductResponseDto.fromEntity(savedProduct), Duration.ofMinutes(15));
 
         return ProductResponseDto.fromEntity(savedProduct);
     }
