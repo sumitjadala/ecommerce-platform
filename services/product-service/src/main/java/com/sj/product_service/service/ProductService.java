@@ -26,15 +26,7 @@ public interface ProductService {
 
     Page<ProductResponseDto> searchProducts(String searchTerm, Pageable pageable);
 
-    Page<ProductResponseDto> getProductsByFilters(
-            String name,
-            UUID categoryId,
-            BigDecimal minPrice,
-            BigDecimal maxPrice,
-            Product.ProductStatus status,
-            Boolean isFeatured,
-            Pageable pageable
-    );
+    Page<ProductResponseDto> getProductsByFilters(String name, UUID categoryId, BigDecimal minPrice, BigDecimal maxPrice, Product.ProductStatus status, Boolean isFeatured, Pageable pageable);
 
     List<ProductResponseDto> getFeaturedProducts();
 

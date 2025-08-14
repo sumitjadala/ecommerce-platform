@@ -41,11 +41,11 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     Page<Product> findActiveProducts(Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE " +
-           "(:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-           "(:status IS NULL OR p.status = :status) AND " +
-           "(:featured IS NULL OR p.featured = :featured) AND " +
-           "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
-           "(:maxPrice IS NULL OR p.price <= :maxPrice)")
+            "(:name IS NULL OR :name = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
+            "(:status IS NULL OR p.status = :status) AND " +
+            "(:featured IS NULL OR p.featured = :featured) AND " +
+            "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
+            "(:maxPrice IS NULL OR p.price <= :maxPrice)")
     Page<Product> findProductsByFilters(
             @Param("name") String name,
             @Param("status") Product.ProductStatus status,
