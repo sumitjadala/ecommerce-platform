@@ -12,14 +12,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
+import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,35 +49,23 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
-    @GetMapping
-    @Operation(summary = "Get all products", description = "Retrieves all products with pagination and filtering")
-    public ResponseEntity<Page<ProductResponseDto>> getProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Boolean featured,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDirection,
-            Authentication authentication) {
+//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<Product> createProduct (
+//            @RequestPart("product") String productId,
+//            @RequestPart("image") MultipartFile imageFile) throws IOException {
+//
+//        Product savedProduct = productService.saveProductWithImage(productId, imageFile);
+//        return ResponseEntity.ok(savedProduct);
+//    }
 
-        log.info("Getting products with page: {}, size: {}, search: {}", page, size, search);
+    @PutMapping(path="/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('SELLER') or hasRole('ADMIN')")
+    public ResponseEntity<Product> upload(
+            @PathVariable String productId,
+            @RequestPart("image") MultipartFile image) throws IOException {
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<ProductResponseDto> products;
-
-        if (search != null && !search.trim().isEmpty()) {
-            products = productService.searchProducts(search, pageable);
-        } else {
-            Product.ProductStatus productStatus = status != null ? Product.ProductStatus.valueOf(status.toUpperCase()) : null;
-            products = productService.getProductsByFilters(null, null, minPrice, maxPrice, productStatus, featured, pageable);
-        }
-
-        return ResponseEntity.ok(products);
+        Product saved = productService.saveProductWithImage(productId, image);
+        return ResponseEntity.created(URI.create("/products/" + saved.getId() + "/image")).body(saved);
     }
 
     @GetMapping("/{id}")
@@ -87,14 +77,6 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("/sku/{sku}")
-    @Operation(summary = "Get product by SKU", description = "Retrieves a specific product by its SKU")
-    public ResponseEntity<ProductResponseDto> getProductBySku(@PathVariable String sku) {
-        log.info("Getting product by SKU: {}", sku);
-
-        ProductResponseDto product = productService.getProductBySku(sku);
-        return ResponseEntity.ok(product);
-    }
 
     @PutMapping("/{id}")
     @PreAuthorize("@productOwnershipValidator.isOwnerOrAdmin(#id, authentication)")
@@ -124,14 +106,6 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/featured")
-    @Operation(summary = "Get featured products", description = "Retrieves all featured products")
-    public ResponseEntity<List<ProductResponseDto>> getFeaturedProducts() {
-        log.info("Getting featured products");
-
-        List<ProductResponseDto> products = productService.getFeaturedProducts();
-        return ResponseEntity.ok(products);
-    }
 
     @GetMapping("/available")
     @Operation(summary = "Get available products", description = "Retrieves all active products")
@@ -186,23 +160,6 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/check/sku/{sku}")
-    @Operation(summary = "Check SKU availability", description = "Checks if a SKU is available")
-    public ResponseEntity<Boolean> checkSkuAvailability(@PathVariable String sku) {
-        log.info("Checking SKU availability: {}", sku);
-
-        boolean exists = productService.existsBySku(sku);
-        return ResponseEntity.ok(!exists); // true if available
-    }
-
-    @GetMapping("/check/slug/{slug}")
-    @Operation(summary = "Check slug availability", description = "Checks if a slug is available")
-    public ResponseEntity<Boolean> checkSlugAvailability(@PathVariable String slug) {
-        log.info("Checking slug availability: {}", slug);
-
-        boolean exists = productService.existsBySlug(slug);
-        return ResponseEntity.ok(!exists); // true if available
-    }
 
     private String extractSellerIdFromAuth(Authentication authentication) {
         if (authentication != null && authentication.getDetails() instanceof Map<?, ?> details) {

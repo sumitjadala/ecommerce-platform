@@ -8,14 +8,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -27,17 +30,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            if (jwtUtil.validateToken(token)) {
-                Claims claims = jwtUtil.extractClaims(token);
-                String username = claims.getSubject();
-                String role = claims.get("role", String.class);
-                String sellerId = claims.get("sellerId", String.class);
-                String authority = role != null && role.startsWith("ROLE_") ? role : "ROLE_" + role;
+        String token = authHeader.substring(7);
+
+        if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
+            Claims claims = jwtUtil.extractClaims(token);
+            String username = claims.getSubject();
+            String sellerId = claims.get("sellerId", String.class);
+            String role = claims.get("role", String.class);
+
+            List<GrantedAuthority> authorities = Collections.emptyList();
+
+            if (role != null) {
+                authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+            }
+
+            if (username != null) {
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(username, null, Collections.singleton(new SimpleGrantedAuthority(authority)));
+                        new UsernamePasswordAuthenticationToken(username, null, authorities);
                 Map<String, Object> details = new HashMap<>();
                 details.put("sellerId", sellerId);
                 authentication.setDetails(details);
@@ -47,5 +61,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 }

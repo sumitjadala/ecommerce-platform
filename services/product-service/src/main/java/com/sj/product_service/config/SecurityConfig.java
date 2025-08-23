@@ -32,7 +32,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/products/featured").permitAll()
                         .requestMatchers("/api/v1/products/search").permitAll()
                         .requestMatchers("/api/v1/products/check/**").permitAll()
-                        .requestMatchers("/api/v1/categories/**").permitAll()
                         .requestMatchers("POST", "/api/v1/products").hasAnyRole("SELLER", "ADMIN")
                         .requestMatchers("PUT", "/api/v1/products/**").hasAnyRole("SELLER", "ADMIN")
                         .requestMatchers("DELETE", "/api/v1/products/**").hasAnyRole("SELLER", "ADMIN")

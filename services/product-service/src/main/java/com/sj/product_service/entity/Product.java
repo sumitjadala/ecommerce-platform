@@ -32,20 +32,10 @@ public class Product {
     @Column(name = "seller_id", nullable = false)
     private UUID sellerId;
 
-    @NotBlank(message = "SKU is required")
-    @Size(min = 3, max = 100, message = "SKU must be between 3 and 100 characters")
-    @Column(nullable = false, unique = true)
-    private String sku;
-
     @NotBlank(message = "Product name is required")
     @Size(min = 2, max = 500, message = "Product name must be between 2 and 500 characters")
     @Column(nullable = false)
     private String name;
-
-    @NotBlank(message = "Product slug is required")
-    @Size(min = 2, max = 500, message = "Product slug must be between 2 and 500 characters")
-    @Column(nullable = false, unique = true)
-    private String slug;
 
     @Size(max = 2000, message = "Description cannot exceed 2000 characters")
     @Column(columnDefinition = "TEXT")
@@ -82,22 +72,8 @@ public class Product {
     @Column(columnDefinition = "TEXT[]")
     private List<String> tags;
 
-    @Size(max = 200, message = "SEO title cannot exceed 200 characters")
-    @Column(name = "seo_title")
-    private String seoTitle;
-
-    @Size(max = 500, message = "SEO description cannot exceed 500 characters")
-    @Column(name = "seo_description")
-    private String seoDescription;
-
-    @Column(name = "meta_keywords", columnDefinition = "TEXT[]")
-    private List<String> metaKeywords;
-
     @Column(name = "featured")
     private Boolean featured = false;
-
-    @Column(name = "digital_product")
-    private Boolean digitalProduct = false;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

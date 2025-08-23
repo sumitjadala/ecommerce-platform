@@ -22,12 +22,11 @@ jwt:
   secret: ${JWT_SECRET}
 
 aws:
+  profile: default
+  region: ap-south-1
   s3:
     endpoint: ${S3_ENDPOINT}
     bucket: ${AWS_S3_BUCKET}
-  credentials:
-    access-key: ${AWS_ACCESS_KEY}
-    secret-key: ${AWS_SECRET_KEY}
 
 server:
   port: ${PRODUCT_SERVICE_PORT}

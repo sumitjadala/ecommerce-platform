@@ -21,14 +21,6 @@ public class ProductRequestDto {
     @Size(min = 2, max = 500, message = "Product name must be between 2 and 500 characters")
     private String name;
 
-    @NotBlank(message = "SKU is required")
-    @Size(min = 3, max = 100, message = "SKU must be between 3 and 100 characters")
-    private String sku;
-
-    @NotBlank(message = "Product slug is required")
-    @Size(min = 2, max = 500, message = "Product slug must be between 2 and 500 characters")
-    private String slug;
-
     @Size(max = 2000, message = "Description cannot exceed 2000 characters")
     private String description;
 
@@ -54,17 +46,7 @@ public class ProductRequestDto {
 
     private List<String> tags;
 
-    @Size(max = 200, message = "SEO title cannot exceed 200 characters")
-    private String seoTitle;
-
-    @Size(max = 500, message = "SEO description cannot exceed 500 characters")
-    private String seoDescription;
-
-    private List<String> metaKeywords;
-
     private Boolean featured = false;
-
-    private Boolean digitalProduct = false;
 
     private UUID sellerId;
 }
