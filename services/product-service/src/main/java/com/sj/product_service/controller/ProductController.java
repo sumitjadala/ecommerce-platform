@@ -3,6 +3,8 @@ package com.sj.product_service.controller;
 import com.sj.product_service.dto.ProductRequestDto;
 import com.sj.product_service.dto.ProductResponseDto;
 import com.sj.product_service.entity.Product;
+import com.sj.product_service.entity.ProductImage;
+import com.sj.product_service.service.ProductImageService;
 import com.sj.product_service.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +27,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -34,6 +37,8 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+
+    private final ProductImageService productImageService;
 
     @PostMapping
     @PreAuthorize("hasRole('SELLER') or hasRole('ADMIN')")
@@ -48,16 +53,6 @@ public class ProductController {
         ProductResponseDto createdProduct = productService.createProduct(productRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
-
-//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<Product> createProduct (
-//            @RequestPart("product") String productId,
-//            @RequestPart("image") MultipartFile imageFile) throws IOException {
-//
-//        Product savedProduct = productService.saveProductWithImage(productId, imageFile);
-//        return ResponseEntity.ok(savedProduct);
-//    }
-
     @PutMapping(path="/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('SELLER') or hasRole('ADMIN')")
     public ResponseEntity<Product> upload(
@@ -66,6 +61,15 @@ public class ProductController {
 
         Product saved = productService.saveProductWithImage(productId, image);
         return ResponseEntity.created(URI.create("/products/" + saved.getId() + "/image")).body(saved);
+    }
+
+    @GetMapping("/{productId}/images")
+    public ResponseEntity<List<String>> getProductImages(@PathVariable String productId) {
+        List<ProductImage> images = productImageService.findAllByProductId(productId);
+        List<String> cdnUrls = images.stream()
+                .map(ProductImage::getCdnUrl)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(cdnUrls);
     }
 
     @GetMapping("/{id}")

@@ -65,7 +65,8 @@ public class ProductImage {
 
     @Column(name = "is_primary")
     private Boolean isPrimary = false;
-
+    @Column(name = "cdn_url")
+    private String cdnUrl;
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

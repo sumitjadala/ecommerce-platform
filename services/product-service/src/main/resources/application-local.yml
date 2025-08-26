@@ -27,7 +27,8 @@ aws:
   s3:
     endpoint: ${S3_ENDPOINT}
     bucket: ${AWS_S3_BUCKET}
-
+  cloudfront:
+    domain: d2jkahmn6fxl2z.cloudfront.net
 server:
   port: ${PRODUCT_SERVICE_PORT}
 

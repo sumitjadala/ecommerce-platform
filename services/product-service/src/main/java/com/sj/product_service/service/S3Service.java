@@ -16,6 +16,8 @@ public interface S3Service {
      */
     String uploadFile(String bucketName, String key, MultipartFile file) throws IOException;
 
+
+    String constructCdnUrl(String s3Key);
     /**
      * Constructs the full public or CDN URL for an S3 object.
      *

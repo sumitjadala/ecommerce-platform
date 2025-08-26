@@ -175,6 +175,7 @@ public class ProductServiceImpl implements ProductService {
         String s3Key = "products/" + product.getId() + "/" + UUID.randomUUID() + "-" + image.getOriginalFilename();
 
         s3Service.uploadFile(bucketName, s3Key, image);
+        String cdnUrl = s3Service.constructCdnUrl(s3Key);
 
         ProductImage productImage = new ProductImage();
         productImage.setProduct(product);
@@ -182,6 +183,7 @@ public class ProductServiceImpl implements ProductService {
         productImage.setS3Key(s3Key);
         productImage.setS3Bucket(bucketName);
         productImage.setFileName(image.getOriginalFilename());
+        productImage.setCdnUrl(cdnUrl);
         productImageRepository.save(productImage);
         return product;
     }
