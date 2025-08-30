@@ -76,11 +76,9 @@ public class ProductController {
     @Operation(summary = "Get product by ID", description = "Retrieves a specific product by its ID")
     public ResponseEntity<ProductResponseDto> getProduct(@PathVariable UUID id) {
         log.info("Getting product by ID: {}", id);
-
         ProductResponseDto product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
-
 
     @PutMapping("/{id}")
     @PreAuthorize("@productOwnershipValidator.isOwnerOrAdmin(#id, authentication)")
@@ -92,9 +90,9 @@ public class ProductController {
 
         log.info("Updating product: {}", id);
 
-        // Extract seller ID from authentication
-        String sellerId = extractSellerIdFromAuth(authentication);
-        productRequestDto.setSellerId(UUID.fromString(sellerId));
+//        // Extract seller ID from authentication
+//        String sellerId = extractSellerIdFromAuth(authentication);
+//        productRequestDto.setSellerId(UUID.fromString(sellerId));
 
         ProductResponseDto updatedProduct = productService.updateProduct(id, productRequestDto);
         return ResponseEntity.ok(updatedProduct);
@@ -109,7 +107,6 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
-
 
     @GetMapping("/available")
     @Operation(summary = "Get available products", description = "Retrieves all active products")
@@ -136,33 +133,33 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @PatchMapping("/{id}/status")
-    @PreAuthorize("@productOwnershipValidator.isOwnerOrAdmin(#id, authentication)")
-    @Operation(summary = "Update product status", description = "Updates the status of a product")
-    public ResponseEntity<Void> updateProductStatus(
-            @PathVariable UUID id,
-            @RequestParam Product.ProductStatus status) {
-
-        log.info("Updating product status: {} to {}", id, status);
-
-        productService.updateProductStatus(id, status);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/search")
-    @Operation(summary = "Search products", description = "Searches products by various criteria")
-    public ResponseEntity<Page<ProductResponseDto>> searchProducts(
-            @RequestParam String q,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-
-        log.info("Searching products with query: {}", q);
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ProductResponseDto> products = productService.searchProducts(q, pageable);
-
-        return ResponseEntity.ok(products);
-    }
+//    @PatchMapping("/{id}/status")
+//    @PreAuthorize("@productOwnershipValidator.isOwnerOrAdmin(#id, authentication)")
+//    @Operation(summary = "Update product status", description = "Updates the status of a product")
+//    public ResponseEntity<Void> updateProductStatus(
+//            @PathVariable UUID id,
+//            @RequestParam Product.ProductStatus status) {
+//
+//        log.info("Updating product status: {} to {}", id, status);
+//
+//        productService.updateProductStatus(id, status);
+//        return ResponseEntity.ok().build();
+//    }
+//
+//    @GetMapping("/search")
+//    @Operation(summary = "Search products", description = "Searches products by various criteria")
+//    public ResponseEntity<Page<ProductResponseDto>> searchProducts(
+//            @RequestParam String q,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "20") int size) {
+//
+//        log.info("Searching products with query: {}", q);
+//
+//        Pageable pageable = PageRequest.of(page, size);
+//        Page<ProductResponseDto> products = productService.searchProducts(q, pageable);
+//
+//        return ResponseEntity.ok(products);
+//    }
 
 
     private String extractSellerIdFromAuth(Authentication authentication) {

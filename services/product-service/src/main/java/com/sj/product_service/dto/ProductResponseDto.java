@@ -1,5 +1,6 @@
 package com.sj.product_service.dto;
 
+import com.sj.product_service.entity.Category;
 import com.sj.product_service.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -29,6 +31,7 @@ public class ProductResponseDto {
     private BigDecimal weight;
     private String dimensions;
     private List<String> tags;
+    private Set<Category> categories;
     private Boolean featured;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -49,6 +52,7 @@ public class ProductResponseDto {
                 .weight(product.getWeight())
                 .dimensions(product.getDimensions())
                 .tags(product.getTags())
+                .categories(product.getCategories())
                 .featured(product.getFeatured())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())

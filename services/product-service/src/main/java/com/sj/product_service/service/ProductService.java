@@ -21,4 +21,5 @@ public interface ProductService {
     void deleteProduct(UUID id);
     void updateProductStatus(UUID productId, Product.ProductStatus status);
     Product saveProductWithImage(String productDTO, MultipartFile imageFile) throws IOException;
+
 }

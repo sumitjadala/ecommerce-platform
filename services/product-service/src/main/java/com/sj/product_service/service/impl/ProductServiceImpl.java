@@ -2,12 +2,15 @@ package com.sj.product_service.service.impl;
 
 import com.sj.product_service.dto.ProductRequestDto;
 import com.sj.product_service.dto.ProductResponseDto;
+import com.sj.product_service.entity.Category;
 import com.sj.product_service.entity.Product;
 import com.sj.product_service.entity.ProductImage;
+import com.sj.product_service.repository.CategoryRepository;
 import com.sj.product_service.repository.ProductImageRepository;
 import com.sj.product_service.repository.ProductRepository;
 import com.sj.product_service.service.ProductService;
 import com.sj.product_service.service.S3Service;
+import com.sj.product_service.util.SlugUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,6 +39,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ProductImageRepository productImageRepository;
+    private final CategoryRepository categoryRepository;
+
     private final S3Service s3Service;
     @Value("${aws.s3.bucket}")
     private String bucketName;
@@ -41,6 +48,10 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDto createProduct(ProductRequestDto productRequestDto) {
         log.info("Creating product: {}", productRequestDto.getName());
 
+        Set<Category> categories = new HashSet<>();
+        if (productRequestDto.getCategories() != null) {
+            categories = new HashSet<>(categoryRepository.findAllById(productRequestDto.getCategories()));
+        }
 
         Product product = Product.builder()
                 .sellerId(productRequestDto.getSellerId())
@@ -55,10 +66,13 @@ public class ProductServiceImpl implements ProductService {
                 .dimensions(productRequestDto.getDimensions())
                 .tags(productRequestDto.getTags())
                 .featured(productRequestDto.getFeatured())
+                .slug(SlugUtil.toSlug(productRequestDto.getName()))
+                .categories(categories)
                 .build();
 
         Product savedProduct = productRepository.save(product);
         log.info("Product created successfully with ID: {}", savedProduct.getId());
+
         return ProductResponseDto.fromEntity(savedProduct);
     }
 
@@ -68,26 +82,6 @@ public class ProductServiceImpl implements ProductService {
 
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
-        Product before = Product.builder()
-                .id(existingProduct.getId())
-                .sellerId(existingProduct.getSellerId())
-                .name(existingProduct.getName())
-                .description(existingProduct.getDescription())
-                .shortDescription(existingProduct.getShortDescription())
-                .price(existingProduct.getPrice())
-                .costPrice(existingProduct.getCostPrice())
-                .currency(existingProduct.getCurrency())
-                .status(existingProduct.getStatus())
-                .weight(existingProduct.getWeight())
-                .dimensions(existingProduct.getDimensions())
-                .tags(existingProduct.getTags())
-                .featured(existingProduct.getFeatured())
-                .createdAt(existingProduct.getCreatedAt())
-                .updatedAt(existingProduct.getUpdatedAt())
-                .createdBy(existingProduct.getCreatedBy())
-                .updatedBy(existingProduct.getUpdatedBy())
-                .build();
-
 
         existingProduct.setName(productRequestDto.getName());
         existingProduct.setDescription(productRequestDto.getDescription());
@@ -187,4 +181,5 @@ public class ProductServiceImpl implements ProductService {
         productImageRepository.save(productImage);
         return product;
     }
+
 }

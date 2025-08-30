@@ -1,7 +1,10 @@
 package com.sj.product_service.dto;
 
 import com.sj.product_service.entity.Product;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -49,4 +53,7 @@ public class ProductRequestDto {
     private Boolean featured = false;
 
     private UUID sellerId;
+
+    @NotNull(message = "Product category is required")
+    private Set<UUID> categories;
 }
