@@ -56,4 +56,12 @@ public class ProductRequestDto {
 
     @NotNull(message = "Product category is required")
     private Set<UUID> categories;
+
+    @NotNull(message = "Initial stock quantity is required")
+    @DecimalMin(value = "0", message = "Stock quantity cannot be negative")
+    private Integer initialStock;
+
+    @NotNull(message = "Reorder level is required")
+    @DecimalMin(value = "0", message = "Reorder level cannot be negative")
+    private Integer reorderLevel;
 }

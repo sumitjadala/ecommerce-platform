@@ -8,6 +8,7 @@ import com.sj.product_service.entity.ProductImage;
 import com.sj.product_service.repository.CategoryRepository;
 import com.sj.product_service.repository.ProductImageRepository;
 import com.sj.product_service.repository.ProductRepository;
+import com.sj.product_service.service.InventoryService;
 import com.sj.product_service.service.ProductService;
 import com.sj.product_service.service.S3Service;
 import com.sj.product_service.util.SlugUtil;
@@ -41,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
 
+    private final InventoryService inventoryService;
     private final S3Service s3Service;
     @Value("${aws.s3.bucket}")
     private String bucketName;
@@ -72,7 +74,9 @@ public class ProductServiceImpl implements ProductService {
 
         Product savedProduct = productRepository.save(product);
         log.info("Product created successfully with ID: {}", savedProduct.getId());
-
+        inventoryService.createInventoryForProductWithStock(savedProduct,
+                productRequestDto.getInitialStock(),
+                productRequestDto.getReorderLevel());
         return ProductResponseDto.fromEntity(savedProduct);
     }
 
